@@ -93,6 +93,10 @@ namespace AMSExplorer
         private const int maxNbJobs = 50000;
         private bool enableTelemetry = true;
 
+        //Webhook
+
+        private bool enableNotificationEndpoint = true;
+
         private static readonly long OneGB = 1024L * 1024L * 1024L;
         private static readonly int S1AssetSizeLimit = 325; // GBytes
         private static readonly int S2AssetSizeLimit = 640; // GBytes
@@ -5451,6 +5455,7 @@ namespace AMSExplorer
                     try
                     {
                         TextBoxLogWriteLine("Job '{0}' : submitting...", jobnameloc);
+
                         myJob.Submit();
                     }
 
@@ -15710,6 +15715,103 @@ namespace AMSExplorer
                     catch (Exception ex)
                     {
                         TextBoxLogWriteLine("Error when deleting telemetry configuration.", true);
+                        TextBoxLogWriteLine(ex);
+                    }
+                });
+            }
+        }
+
+
+        private void configureNotificationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DoConfigureWebHook();
+        }
+
+        private void DoConfigureWebHook()
+        {
+            var currentNotificationConfig = _context.NotificationEndPoints.Where(e => e.Name == Constants.WebHookFunctionName).FirstOrDefault();
+
+            var form = new ConfigureWebhook(_context, currentNotificationConfig);
+            var DR = form.ShowDialog();
+
+            //Create a new notification Endpoint
+            if (DR == DialogResult.OK) // new or update
+            {
+                var config = form.WebhookConfig;
+
+                var list = new List<NotificationEndPointCollection>();              
+
+                if (currentNotificationConfig == null) // creation of Notification configuration
+                {
+                    Task.Run(() =>
+                    {
+                        try
+                        {
+                            TextBoxLogWriteLine("NotificationEndpoint Webhook Type configuration...");
+
+                            INotificationEndPoint notificationEndPoint = _context.NotificationEndPoints.Create(Constants.WebHookFunctionName, config.WebhookNotificationEndpointType, config.WebhookEndpoint);
+                            TextBoxLogWriteLine("notificationEndpoint Webhook created...");
+
+                           // IMonitoringConfiguration monitoringConfiguration = _context.MonitoringConfigurations.Create(notificationEndPoint.Id, list);
+                            enableNotificationEndpoint = true;
+
+                            TextBoxLogWriteLine(string.Format("NotificationEndpoint {0} Webhook configured.", Constants.WebHookFunctionName));
+                        }
+
+                        catch (Exception ex)
+                        {
+                            TextBoxLogWriteLine("Error when configuring Notification.", true);
+                            TextBoxLogWriteLine(ex);
+                        }
+                    });
+                }
+                else // existing webhook setup - to update now
+                {
+                    Task.Run(() =>
+                    {
+                        try
+                        {
+                            TextBoxLogWriteLine("Delete existing NotificationEndpoint");
+                            currentNotificationConfig.Delete();
+
+                            TextBoxLogWriteLine("Add a new NotificationEndpoint Webhook Type configuration...");
+                            currentNotificationConfig = _context.NotificationEndPoints.Create(Constants.WebHookFunctionName, config.WebhookNotificationEndpointType, config.WebhookEndpoint);
+                            TextBoxLogWriteLine("notificationEndpoint Webhook created...");
+
+                            enableNotificationEndpoint = true;
+
+                            TextBoxLogWriteLine("NotificationEndpoint updated.");
+                        }
+
+                        catch (Exception ex)
+                        {
+                            TextBoxLogWriteLine("Error when updating NotificationEndpoint.", true);
+                            TextBoxLogWriteLine(ex);
+                        }
+                    });
+
+                }
+
+            }
+            else if (DR == DialogResult.Abort) // delete the config
+            {
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        TextBoxLogWriteLine("NotificationEndpoint configuration deletion...");
+                        if(currentNotificationConfig!=null)
+                        {
+                            currentNotificationConfig.Delete();
+                        }
+
+                        enableNotificationEndpoint = false;
+
+                    }
+
+                    catch (Exception ex)
+                    {
+                        TextBoxLogWriteLine("Error when deleting Webhook NotificationEndpoint configuration.", true);
                         TextBoxLogWriteLine(ex);
                     }
                 });

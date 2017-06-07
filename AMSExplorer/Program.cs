@@ -1051,6 +1051,7 @@ namespace AMSExplorer
         public const string LinkMoreInfoStorageAnalytics = "https://msdn.microsoft.com/library/azure/hh343258.aspx";
         public const string LinkMoreInfoFairPlay = "https://docs.microsoft.com/en-us/azure/media-services/media-services-protect-hls-with-fairplay";
         public const string LinkMoreInfoTelemetry = "https://docs.microsoft.com/en-us/azure/media-services/media-services-telemetry-overview";
+        public const string LinkMoreInfoNotificationEndPoint = "https://docs.microsoft.com/en-us/rest/api/media/operations/notificationendpoint";
 
         public const string LinkMoreYammerAMSPreview = "https://www.yammer.com/azureadvisors/#/threads/inGroup?type=in_group&feedId=3165917";
         public const string LinkMoreInfoMotionDetection = "https://docs.microsoft.com/en-us/azure/media-services/media-services-motion-detection";
@@ -1097,6 +1098,8 @@ namespace AMSExplorer
 
         public const int MaxTransfersAsUnlimited = 5;
         public const string strTransfers = "{0} concurrent transfer{1}";
+
+        public const string WebHookFunctionName = "webHookFunction";
     }
 
 
@@ -4072,6 +4075,14 @@ namespace AMSExplorer
         public MonitoringLevel MonitorLevelStreamingEndpoint { get; set; }
     }
 
+
+    public class ConfigWebhookVar
+    {
+        public string WebhookEndpoint { get; set; }
+
+        public NotificationEndPointType WebhookNotificationEndpointType { get; set; }
+        public NotificationJobState WebhookNotificationJobState { get; set; }
+    }
 
 
     public sealed class FilterPropertyFourCCValue

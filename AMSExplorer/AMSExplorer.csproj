@@ -242,6 +242,12 @@
     <Compile Include="Forms-MediaAnalytics\MediaAnalyticsContentModeration.Designer.cs">
       <DependentUpon>MediaAnalyticsContentModeration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms-NotificationWebhook\ConfigureWebhook.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms-NotificationWebhook\ConfigureWebhook.Designer.cs">
+      <DependentUpon>ConfigureWebhook.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms-Telemetry\DisplayTelemetry.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1061,6 +1067,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms-MediaAnalytics\MediaAnalyticsVideoThumbnails.ja.resx">
       <DependentUpon>MediaAnalyticsVideoThumbnails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms-NotificationWebhook\ConfigureWebhook.ja.resx">
+      <DependentUpon>ConfigureWebhook.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms-NotificationWebhook\ConfigureWebhook.resx">
+      <DependentUpon>ConfigureWebhook.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms-Telemetry\ConfigureTelemetry.ja.resx">
       <DependentUpon>ConfigureTelemetry.cs</DependentUpon>
