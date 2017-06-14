@@ -4358,7 +4358,6 @@ namespace AMSExplorer
             // object.
             ThisListView.ListViewItemSorter = new ListViewItemComparer(e.Column,
                                                               ThisListView.Sorting);
-
         }
     }
 
