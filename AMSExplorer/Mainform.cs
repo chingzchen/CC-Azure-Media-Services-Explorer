@@ -94,7 +94,7 @@ namespace AMSExplorer
         private bool enableTelemetry = true;
 
         //Webhook
-
+        private static INotificationEndPoint CurrentWebHookEndpoint;
         private bool enableNotificationEndpoint = true;
 
         private static readonly long OneGB = 1024L * 1024L * 1024L;
@@ -157,7 +157,7 @@ namespace AMSExplorer
             if ((Properties.Settings.Default.DefaultSlateCurrentFolder == string.Empty) || (!Directory.Exists(Properties.Settings.Default.DefaultSlateCurrentFolder)))
             {
                 Properties.Settings.Default.DefaultSlateCurrentFolder = Application.StartupPath + Constants.PathDefaultSlateJPG;
-            }
+            }           
 
             Program.SaveAndProtectUserConfig(); // to save settings 
 
@@ -186,6 +186,15 @@ namespace AMSExplorer
 
             // Get the service context.
             _context = Program.ConnectAndGetNewContext(_credentials, true);
+
+            //enableNotificationEndpoint
+            if (_context != null)
+            {
+                if (enableNotificationEndpoint)
+                {
+                    CurrentWebHookEndpoint = _context.NotificationEndPoints.Where(e => e.Name == Constants.WebHookFunctionName).FirstOrDefault();
+                }
+            }
 
             // mainform title
             toolStripStatusLabelConnection.Text = String.Format("Version {0}", Assembly.GetExecutingAssembly().GetName().Version) + " - Connected to " + _context.Credentials.ClientId;
@@ -6516,6 +6525,10 @@ namespace AMSExplorer
                 // Submit the job and wait until it is completed. 
                 try
                 {
+                    if (enableNotificationEndpoint)
+                    {
+                        job.JobNotificationSubscriptions.AddNew(NotificationJobState.FinalStatesOnly, CurrentWebHookEndpoint);
+                    }
                     job.Submit();
                 }
                 catch (Exception e)
@@ -13848,6 +13861,7 @@ namespace AMSExplorer
                     TextBoxLogWriteLine("Submitting job '{0}'", jobnameloc);
                     try
                     {
+                        job.JobNotificationSubscriptions.AddNew(NotificationJobState.FinalStatesOnly, CurrentWebHookEndpoint);
                         job.Submit();
                     }
                     catch (Exception e)
@@ -13889,6 +13903,7 @@ namespace AMSExplorer
                         TextBoxLogWriteLine("Submitting job '{0}'", jobnameloc);
                         try
                         {
+                            job.JobNotificationSubscriptions.AddNew(NotificationJobState.FinalStatesOnly, CurrentWebHookEndpoint);
                             job.Submit();
                         }
                         catch (Exception e)
@@ -15751,7 +15766,7 @@ namespace AMSExplorer
 
                             INotificationEndPoint notificationEndPoint = _context.NotificationEndPoints.Create(Constants.WebHookFunctionName, config.WebhookNotificationEndpointType, config.WebhookEndpoint);
                             TextBoxLogWriteLine("notificationEndpoint Webhook created...");
-
+                            CurrentWebHookEndpoint = notificationEndPoint;
                            // IMonitoringConfiguration monitoringConfiguration = _context.MonitoringConfigurations.Create(notificationEndPoint.Id, list);
                             enableNotificationEndpoint = true;
 
@@ -15775,7 +15790,8 @@ namespace AMSExplorer
                             currentNotificationConfig.Delete();
 
                             TextBoxLogWriteLine("Add a new NotificationEndpoint Webhook Type configuration...");
-                            currentNotificationConfig = _context.NotificationEndPoints.Create(Constants.WebHookFunctionName, config.WebhookNotificationEndpointType, config.WebhookEndpoint);
+                            CurrentWebHookEndpoint = _context.NotificationEndPoints.Create(Constants.WebHookFunctionName, config.WebhookNotificationEndpointType, config.WebhookEndpoint);
+
                             TextBoxLogWriteLine("notificationEndpoint Webhook created...");
 
                             enableNotificationEndpoint = true;
