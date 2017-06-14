@@ -6525,6 +6525,7 @@ namespace AMSExplorer
                 // Submit the job and wait until it is completed. 
                 try
                 {
+                    //add endpoint webhook in encoding job
                     if (enableNotificationEndpoint)
                     {
                         job.JobNotificationSubscriptions.AddNew(NotificationJobState.FinalStatesOnly, CurrentWebHookEndpoint);
